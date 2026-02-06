@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card" style="max-width:600px; margin:auto;">
+  <h3>Online Payment (Demo)</h3>
+
+  <p>
+    Booking ID: <strong>{{ booking.booking_id }}</strong><br>
+    Customer: <strong>{{ booking.cust_name }}</strong><br>
+    Total amount: <strong>{{ total }}</strong>
+  </p>
+
+  <p style="margin-top:15px;">
+    🔧 This is just a stub page. Here you can integrate:
+  </p>
+  <ul>
+    <li>Razorpay Checkout script</li>
+    <li>Stripe Checkout button</li>
+  </ul>
+
+  <p>
+    For your DBMS project, this page itself is enough to show that
+    the system is ready for an online gateway integration.
+  </p>
+</div>
+
+{% endblock %}

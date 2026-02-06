@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Travel MTech System</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+
+    <!-- STATUS BACKGROUND COLORS -->
+    <style>
+        .row-paid {
+            background-color: #e5ffe5 !important;   /* Light green */
+        }
+        .row-pending {
+            background-color: #fff7c2 !important;   /* Light yellow */
+        }
+        .row-failed {
+            background-color: #ffe5e5 !important;   /* Light red */
+        }
+
+        /* Flash message colors */
+        .flash-success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .flash-error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h2>Travel Management Dashboard</h2>
+    </div>
+
+    <div class="container">
+
+        <!-- SIDEBAR -->
+        <div class="sidebar card">
+            <a href="{{ url_for('index') }}">Dashboard</a>
+            <a href="{{ url_for('customers') }}">Customers</a>
+            <a href="{{ url_for('destinations') }}">Destinations</a>
+            <a href="{{ url_for('bookings') }}">Bookings</a>
+            <a href="{{ url_for('payments') }}">Payments</a>
+            <a href="{{ url_for('reports') }}">Reports</a>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="content">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for cat, msg in messages %}
+                    <div class="flash flash-{{ cat }}">{{ msg }}</div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+
+        </div>
+    </div>
+</body>
+</html>

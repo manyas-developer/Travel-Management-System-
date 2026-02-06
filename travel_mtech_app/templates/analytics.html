@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+  <h3>Analytics</h3>
+
+  <div id="chart" style="width:100%; height:450px;"></div>
+
+  <!-- Load Plotly -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+  <script>
+      // graphJSON comes as a JSON string from Flask
+      var graphJSON = '{{ graphJSON | safe }}';
+
+      // Convert string → object
+      var parsedGraph = JSON.parse(graphJSON);
+
+      // Plot
+      Plotly.newPlot("chart", parsedGraph.data, parsedGraph.layout);
+  </script>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card glass">
+    <h2 class="page-title">Settings</h2>
+    <p class="subtitle">Dark mode toggle is available in the header. Use this to clear logs.</p>
+
+    <button class="btn" id="clearLogsBtn">Clear Booking Logs</button>
+
+    <script>
+        document.getElementById("clearLogsBtn").onclick = function () {
+            if (!confirm("Clear all booking logs?")) return;
+            fetch("/api/reset_logs", { method: "POST" })
+                .then(r => r.json())
+                .then(d => alert(d.msg));
+        };
+    </script>
+</div>
+
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card" style="max-width:750px; margin:auto;">
+  <h3>Booking Receipt</h3>
+
+  <!-- HEADER -->
+  <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+    <div>
+      <strong>Booking #{{ booking.booking_id }}</strong><br>
+      Date: {{ booking.booking_date }}<br>
+      Status:
+      {% if booking.payment_status == 'PAID' %}
+        <span style="color:green; font-weight:bold;">PAID</span>
+      {% elif booking.payment_status == 'PENDING' %}
+        <span style="color:orange; font-weight:bold;">PENDING</span>
+      {% else %}
+        <span style="color:red; font-weight:bold;">NOT PAID</span>
+      {% endif %}
+    </div>
+
+    <div style="text-align:right;">
+      <strong>{{ booking.cust_name }}</strong><br>
+      {{ booking.email }}<br>
+      {{ booking.city }}
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- BOOKING DETAILS -->
+  <h4>Booking Details</h4>
+  <p>
+    Destination: <strong>{{ booking.dest_name }}</strong> ({{ booking.country }})<br>
+    Number of Persons: <strong>{{ booking.num_persons }}</strong>
+  </p>
+
+  <!-- AMOUNT BREAKDOWN -->
+  <h4>Amount Summary</h4>
+  <table style="width:100%; border-collapse:collapse;">
+    <tr>
+      <td>Base price (per person)</td>
+      <td style="text-align:right;">₹{{ booking.base_price }}</td>
+    </tr>
+    <tr>
+      <td>Persons</td>
+      <td style="text-align:right;">× {{ booking.num_persons }}</td>
+    </tr>
+    <tr>
+      <td style="border-top:1px solid #ccc;"><strong>Total Amount</strong></td>
+      <td style="text-align:right; border-top:1px solid #ccc;">
+        <strong>₹{{ final_price }}</strong>
+      </td>
+    </tr>
+    <tr>
+      <td>Amount Paid</td>
+      <td style="text-align:right; color:green;">₹{{ paid_amount }}</td>
+    </tr>
+    <tr>
+      <td>Pending Amount</td>
+      <td style="text-align:right; color:red;">₹{{ pending_amount }}</td>
+    </tr>
+  </table>
+
+  <hr>
+
+  <!-- PAYMENT HISTORY -->
+  <h4>Payment History</h4>
+
+  <table style="width:100%; border-collapse:collapse;">
+    <tr style="font-weight:bold; border-bottom:1px solid #ccc;">
+      <td>ID</td>
+      <td>Amount</td>
+      <td>Mode</td>
+      <td>Status</td>
+      <td>Date</td>
+    </tr>
+
+    {% for p in payments %}
+    <tr>
+      <td>{{ p.pay_id }}</td>
+      <td>₹{{ p.amount }}</td>
+      <td>{{ p.pay_mode }}</td>
+      <td>
+        {% if p.status == 'SUCCESS' %}
+          <span style="color:green;">PAID</span>
+        {% elif p.status == 'PENDING' %}
+          <span style="color:orange;">PENDING</span>
+        {% else %}
+          <span style="color:red;">FAILED</span>
+        {% endif %}
+      </td>
+      <td>{{ p.pay_date }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <div style="margin-top:20px; display:flex; justify-content:space-between;">
+    <span></span>
+    <button class="btn" onclick="window.print();">Print / Download Receipt</button>
+  </div>
+
+</div>
+
+{% endblock %}

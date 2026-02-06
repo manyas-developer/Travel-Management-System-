@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+  <h3>Reports</h3>
+
+  <h4>Revenue Per Destination</h4>
+  <table>
+    <thead><tr><th>Destination</th><th>Revenue</th></tr></thead>
+    <tbody>
+      {% for r in reports.revenue %}
+      <tr><td>{{ r.dest_name }}</td><td>{{ r.total_revenue }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h4>Most Booked</h4>
+  <table>
+    <thead><tr><th>Destination</th><th>Bookings</th></tr></thead>
+    <tbody>
+      {% for r in reports.most_booked %}
+      <tr><td>{{ r.dest_name }}</td><td>{{ r.total_bookings }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+
+{% endblock %}

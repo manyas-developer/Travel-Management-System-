@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card">
+    <h3>Destinations</h3>
+
+    <div style="text-align:right; margin-bottom:10px;">
+        <a href="{{ url_for('add_destination') }}" class="btn btn-primary">+ Add</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Country</th>
+                <th>Base Price</th>
+                <th>Season</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for dest in destinations %}
+            <tr>
+                <td>{{ dest.dest_id }}</td>
+                <td>{{ dest.dest_name }}</td>
+                <td>{{ dest.country }}</td>
+                <td>{{ dest.base_price }}</td>
+                <td>{{ dest.season }}</td>
+
+                <td>
+                    <!-- Edit Button -->
+                    <a href="{{ url_for('edit_destination', id=dest.dest_id) }}" class="action-link">
+                        Edit
+                    </a>
+
+                    <!-- Delete Button (FIXED NAME!!) -->
+                    <a href="{{ url_for('delete_destination', id=dest.dest_id) }}"
+                       class="action-link"
+                       onclick="return confirm('Delete this destination?');">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

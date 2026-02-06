@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .row-paid { background-color: #e5ffe5 !important; }
+    .row-pending { background-color: #fff7c2 !important; }
+    .row-notpaid { background-color: #ffe5e5 !important; }
+
+    .status-badge {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 13px;
+    }
+    .status-paid { background: #c7ffd0; color: #0b6b16; }
+    .status-pending { background: #ffeaa7; color: #8a6d1d; }
+    .status-notpaid { background: #ffb8b8; color: #8b0000; }
+
+    .tooltip {
+        cursor: pointer;
+        border-bottom: 1px dotted #888;
+    }
+
+    /* Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6);
+        z-index: 2000;
+    }
+    .modal-content {
+        background: #fff;
+        width: 450px;
+        margin: 80px auto;
+        padding: 20px;
+        border-radius: 10px;
+        animation: pop 0.3s ease-out;
+    }
+    @keyframes pop {
+        from { transform: scale(0.8); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+    .close {
+        float: right;
+        font-size: 24px;
+        cursor: pointer;
+    }
+    .modal-row {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 12px;
+    }
+    .modal-row input,
+    .modal-row select {
+        padding: 7px;
+        border-radius: 6px;
+        border: 1px solid #bbb;
+    }
+    .btn.small {
+        padding: 4px 10px;
+        font-size: 13px;
+    }
+</style>
+
+<div class="card">
+  <h3>Bookings</h3>
+
+  <!-- ADD BOOKING FORM -->
+  <form method="post" action="{{ url_for('add_booking') }}">
+    <div class="form-row">
+
+      <select name="cust_id" required>
+        <option value="">-- Select Customer --</option>
+        {% for c in customers %}
+        <option value="{{ c.cust_id }}">{{ c.cust_name }}</option>
+        {% endfor %}
+      </select>
+
+      <select name="dest_id" required>
+        <option value="">-- Select Destination --</option>
+        {% for d in destinations %}
+        <option value="{{ d.dest_id }}">{{ d.dest_name }}</option>
+        {% endfor %}
+      </select>
+
+      <input type="date" name="booking_date" required>
+      <input type="number" name="num_persons" min="1" value="1" required>
+
+    </div>
+    <button class="btn" type="submit">Create Booking</button>
+  </form>
+
+
+  <!-- BOOKINGS TABLE -->
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Customer</th>
+        <th>Destination</th>
+        <th>Date</th>
+        <th>Persons</th>
+        <th>Final Price</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for b in bookings %}
+      <tr class="
+        {% if b.payment_status == 'PAID' %} row-paid
+        {% elif b.payment_status == 'PENDING' %} row-pending
+        {% else %} row-notpaid
+        {% endif %}
+      ">
+        <td>{{ b.booking_id }}</td>
+        <td>{{ b.cust_name }}</td>
+        <td>{{ b.dest_name }}</td>
+        <td>{{ b.booking_date }}</td>
+        <td>{{ b.num_persons }}</td>
+
+        <td>
+          <span class="tooltip"
+                title="Price Breakdown: {{ b.num_persons }} × base price">
+            ₹{{ b.final_price }}
+          </span>
+        </td>
+
+        <td>
+          {% if b.payment_status == 'PAID' %}
+            <span class="status-badge status-paid">PAID</span>
+          {% elif b.payment_status == 'PENDING' %}
+            <span class="status-badge status-pending">PENDING</span>
+          {% else %}
+            <span class="status-badge status-notpaid">NOT PAID</span>
+          {% endif %}
+        </td>
+
+        <td>
+
+          {% if b.payment_status != 'PAID' %}
+          <button class="btn small pay-btn"
+                  data-booking="{{ b.booking_id }}"
+                  data-name="{{ b.cust_name }}"
+                  data-dest="{{ b.dest_name }}"
+                  data-persons="{{ b.num_persons }}"
+                  data-price="{{ b.final_price }}">
+            Pay Now
+          </button>
+          {% endif %}
+
+          <a href="{{ url_for('delete_booking', id=b.booking_id) }}"
+             onclick="return confirm('Delete booking?');">
+            Delete
+          </a>
+
+          {% if b.payment_status == 'PAID' %}
+            |
+            <a href="{{ url_for('booking_receipt', booking_id=b.booking_id) }}">
+              Receipt
+            </a>
+          {% endif %}
+        </td>
+
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+
+<!-- PAYMENT MODAL -->
+<div id="paymentModal" class="modal">
+    <div class="modal-content card">
+
+        <span class="close">&times;</span>
+        <h2>Complete Payment</h2>
+
+        <form method="post" action="{{ url_for('add_payment') }}">
+
+            <input type="hidden" name="booking_id" id="modal_booking_id">
+
+            <div class="modal-row">
+                <label>Customer</label>
+                <input id="modal_cust_name" readonly>
+            </div>
+
+            <div class="modal-row">
+                <label>Destination</label>
+                <input id="modal_dest" readonly>
+            </div>
+
+            <div class="modal-row">
+                <label>Persons</label>
+                <input id="modal_persons" readonly>
+            </div>
+
+            <div class="modal-row">
+                <label>Total Amount</label>
+                <input name="amount" id="modal_amount" readonly>
+            </div>
+
+            <div class="modal-row">
+                <label>Payment Mode</label>
+                <select name="pay_mode" required>
+                    <option value="">Select</option>
+                    <option value="UPI">UPI</option>
+                    <option value="CARD">CARD</option>
+                    <option value="CASH">CASH</option>
+                </select>
+            </div>
+
+            <div class="modal-row">
+                <label>Status</label>
+                <select name="status" required>
+                    <option value="SUCCESS">SUCCESS</option>
+                    <option value="PENDING">PENDING</option>
+                    <option value="FAILED">FAILED</option>
+                </select>
+            </div>
+
+            <button class="btn full">Pay Now</button>
+        </form>
+    </div>
+</div>
+
+
+<!-- MODAL JS -->
+<script>
+const modal = document.getElementById("paymentModal");
+const closeBtn = document.querySelector(".close");
+
+// open modal with data
+document.querySelectorAll(".pay-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+
+        document.getElementById("modal_booking_id").value = btn.dataset.booking;
+        document.getElementById("modal_cust_name").value = btn.dataset.name;
+        document.getElementById("modal_dest").value = btn.dataset.dest;
+        document.getElementById("modal_persons").value = btn.dataset.persons;
+        document.getElementById("modal_amount").value = btn.dataset.price;
+
+        modal.style.display = "block";
+    });
+});
+
+// close modal
+closeBtn.onclick = () => modal.style.display = "none";
+window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; };
+</script>
+
+{% endblock %}

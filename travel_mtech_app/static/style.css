@@ -1,0 +1,144 @@
+/* GLOBAL THEME */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    color: #222;
+}
+
+/* HEADER */
+.header {
+    background: #1976D2;
+    padding: 20px;
+    color: white;
+}
+
+/* LAYOUT */
+.container {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 220px;
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+}
+
+.sidebar a {
+    display: block;
+    padding: 10px;
+    color: #1976D2;
+    text-decoration: none;
+    margin-bottom: 8px;
+}
+
+/* CONTENT */
+.content {
+    flex: 1;
+}
+
+/* CARD */
+.card {
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.card.mini {
+    text-align: center;
+}
+
+/* FORM */
+.form-row {
+    display: flex;
+    gap: 10px;
+}
+
+.form-row input, .form-row select {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+/* BUTTONS */
+.btn {
+    background: #1976D2;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn.cancel {
+    background: #777;
+}
+
+/* TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* FLASH MESSAGES */
+.flash {
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.flash-success {
+    background: #e5ffe5;
+    color: #2e7d32;
+}
+
+.flash-error {
+    background: #ffe5e5;
+    color: #c62828;
+}
+
+/* LOGIN PAGE */
+.login-body {
+    background: #e3f2fd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-box {
+    background: white;
+    padding: 24px;
+    width: 350px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.login-btn {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.row-paid {
+    background-color: #e5ffe5 !important;   /* Light green */
+}
+
+.row-pending {
+    background-color: #fff7c2 !important;   /* Light yellow */
+}
+
+.row-notpaid {
+    background-color: #ffe5e5 !important;   /* Light red */
+}

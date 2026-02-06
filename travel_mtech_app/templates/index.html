@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    /* DASHBOARD GRID */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        padding: 25px;
+        background: white;
+        border-radius: 14px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        transition: 0.3s;
+        text-align: center;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 25px rgba(0,0,0,0.10);
+    }
+
+    .stat-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #5a5a5a;
+    }
+
+    .stat-value {
+        font-size: 36px;
+        font-weight: 700;
+        margin-top: 10px;
+        color: #0077ff;
+    }
+
+    /* CHART CONTAINER */
+    .chart-box {
+        padding: 20px;
+        margin-top: 25px;
+        background: white;
+        border-radius: 14px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+
+    .chart-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+</style>
+
+<h1 class="page-title">Dashboard Overview</h1>
+
+<!-- STATISTICS CARDS -->
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <div class="stat-title">Customers</div>
+        <div id="custCounter" class="stat-value">{{ cust_cnt }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-title">Destinations</div>
+        <div id="destCounter" class="stat-value">{{ dest_cnt }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-title">Bookings</div>
+        <div id="bookCounter" class="stat-value">{{ booking_cnt }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-title">Payments</div>
+        <div id="payCounter" class="stat-value">{{ payment_cnt }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-title">Revenue</div>
+        <div id="revCounter" class="stat-value">₹{{ revenue }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-title">Pending Payments</div>
+        <div id="pendingCounter" class="stat-value">{{ pending_payments }}</div>
+    </div>
+
+</div>
+
+<!-- CHARTS -->
+<div class="chart-box">
+    <div class="chart-title">Monthly Revenue</div>
+    <div id="revenueChart" style="height:350px;"></div>
+</div>
+
+<div class="chart-box">
+    <div class="chart-title">Monthly Bookings</div>
+    <div id="bookingChart" style="height:350px;"></div>
+</div>
+
+<div class="chart-box">
+    <div class="chart-title">Bookings Per Destination</div>
+    <div id="destinationPie" style="height:350px;"></div>
+</div>
+
+<!-- PLOTLY -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+
+
+<script>
+
+let monthlyRevenue = JSON.parse('{{ monthly_revenue | tojson | safe }}');
+let monthlyBookings = JSON.parse('{{ monthly_bookings | tojson | safe }}');
+let pieLabels = JSON.parse('{{ pie_labels | tojson | safe }}');
+let pieValues = JSON.parse('{{ pie_values | tojson | safe }}');
+
+let months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+/* Revenue Chart */
+Plotly.newPlot("revenueChart", [{
+    x: months,
+    y: monthlyRevenue,
+    type: "scatter",
+    mode: "lines+markers",
+    line: { color: "#0077ff", width: 3 }
+}], { margin: { t:20 } });
+
+/* Booking Chart */
+Plotly.newPlot("bookingChart", [{
+    x: months,
+    y: monthlyBookings,
+    type: "bar",
+    marker: { color: "#28a745" }
+}], { margin: { t:20 } });
+
+/* Destination Pie Chart */
+Plotly.newPlot("destinationPie", [{
+    labels: pieLabels,
+    values: pieValues,
+    type: "pie"
+}], { margin: { t:20 } });
+
+
+
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .row-paid    { background-color:#e5ffe5; }
+  .row-pending { background-color:#fff7c2; }
+  .row-failed  { background-color:#ffe5e5; }
+
+  .pill-status {
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 13px;
+  }
+</style>
+
+<div class="card">
+  <h3>Payments</h3>
+
+  <!-- PAYMENT FORM -->
+  <form method="post" action="{{ url_for('add_payment') }}">
+    <div class="form-row">
+
+      <!-- Booking Dropdown -->
+      <select id="bookingSelect" name="booking_id" required>
+        <option value="">-- Select Booking ID --</option>
+        {% for b in bookings %}
+        <option value="{{ b.booking_id }}" data-amount="{{ b.final_price }}">
+          {{ b.booking_id }}
+        </option>
+        {% endfor %}
+      </select>
+
+      <!-- Auto Amount (readonly) -->
+      <input id="amountBox" name="amount" placeholder="Amount" readonly>
+
+      <!-- Payment Mode (dropdown) -->
+      <select name="pay_mode" required>
+        <option value="">Mode</option>
+        <option value="UPI">UPI</option>
+        <option value="CARD">CARD</option>
+        <option value="CASH">CASH</option>
+      </select>
+
+      <!-- Status -->
+      <select name="status" required>
+        <option value="SUCCESS">SUCCESS</option>
+        <option value="FAILED">FAILED</option>
+        <option value="PENDING">PENDING</option>
+      </select>
+
+    </div>
+
+    <button class="btn" type="submit">Record Payment</button>
+  </form>
+
+  <!-- Auto-fill amount script -->
+  <script>
+    (function() {
+      const bookingSelect = document.getElementById("bookingSelect");
+      const amountBox = document.getElementById("amountBox");
+
+      if (bookingSelect && amountBox) {
+        bookingSelect.addEventListener("change", function () {
+          const selected = this.options[this.selectedIndex];
+          const amount = selected.getAttribute("data-amount");
+          amountBox.value = amount ? amount : "";
+        });
+      }
+    })();
+  </script>
+
+  <!-- PAYMENT TABLE -->
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Booking</th>
+        <th>Customer</th>
+        <th>Amount</th>
+        <th>Date</th>
+        <th>Mode</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for p in payments %}
+      <tr
+        class="
+          {% if p.status == 'SUCCESS' %}row-paid
+          {% elif p.status == 'PENDING' %}row-pending
+          {% else %}row-failed{% endif %}
+        "
+      >
+        <td>{{ p.pay_id }}</td>
+        <td>{{ p.booking_id }}</td>
+        <td>{{ p.cust_name }}</td>
+        <td>{{ p.amount }}</td>
+        <td>{{ p.pay_date }}</td>
+        <td>{{ p.pay_mode }}</td>
+
+        <td>
+          {% if p.status == 'SUCCESS' %}
+            <span class="pill-status" style="background:#c7ffd0; color:green;">PAID</span>
+          {% elif p.status == 'PENDING' %}
+            <span class="pill-status" style="background:#ffeaa7; color:orange;">PENDING</span>
+          {% else %}
+            <span class="pill-status" style="background:#ffb8b8; color:red;">FAILED</span>
+          {% endif %}
+        </td>
+
+        <td>
+          <a href="{{ url_for('delete_payment', id=p.pay_id) }}"
+             onclick="return confirm('Delete this payment?');">
+             Delete
+          </a>
+          |
+          <!-- Receipt per BOOKING (matches /receipt/<booking_id> in app.py) -->
+          <a href="{{ url_for('booking_receipt', booking_id=p.booking_id) }}" target="_blank">
+             Receipt
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
